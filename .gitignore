@@ -1,0 +1,11 @@
+# ignore everything
+*
+
+# Except Verilog, SystemVerilog and Test Vectors
+!.gitignore
+!*.sv
+!*.v
+!*.tv
+
+# ...even if they are in subdirectories
+!*/
