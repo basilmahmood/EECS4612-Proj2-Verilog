@@ -14,9 +14,8 @@ module testbench #(parameter N = 20);
 
     localparam clk_period = 10;
     localparam cycle_period = (clk_period*N);
-    localparam start_load = clk_period*2;
-    localparam finish_load = clk_period*3;
-    localparam init_cycle = finish_load + cycle_period;
+    localparam start_load = clk_period;
+    localparam finish_load = clk_period;
 
     initial begin
         s = 0;
@@ -37,7 +36,7 @@ module testbench #(parameter N = 20);
         #(finish_load) load = 0;
         #(finish_load) s = 0;
 
-        #(init_cycle*3) $finish;
+        #(cycle_period*3) $finish;
     end
 
 
