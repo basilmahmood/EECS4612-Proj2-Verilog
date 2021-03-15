@@ -58,8 +58,6 @@ module lfsr #(parameter N = 26)
     genvar i_load_mux;
     generate 
         for (i_load_mux = 0; i_load_mux < 4; i_load_mux++) begin
-            
-        end
             mux load_mux(load_mux_out[i_load_mux], load, s[i_load_mux], zero);
         end
     endgenerate
