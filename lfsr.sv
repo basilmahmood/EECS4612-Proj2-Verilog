@@ -4,7 +4,7 @@
 //test bench for d flip flop
 //1. Declare module and ports
 
-module testbench #(parameter N = 20);
+module testbench #(parameter N = 26);
     logic r, clk, load;
     logic [3:0] s;
     logic [N-1:0] q, qbar;
@@ -61,14 +61,18 @@ module lfsr #(parameter N = 26)
         end
     endgenerate
 
-    d_flip_flop_with_sr first_ff(tap_out[N-1], zero, r, clk, q[0], qbar[0]);
     genvar i;
     generate
         for (i = 1; i < N; i++) begin
-            if ((i == 2) || (i == 19)) begin
-                xor tap(tap_out[i], q[N-1], q[i-1]);
+            logic tap_location = (i - 1 > 0) ? (i - 1) : N-1; // Tap location is 1 behind the index location (on the first index, tap is created on the last index)
+
+            // Create a flip-flop with a tap
+            if ((tap_location == 0) || (tap_location == 1) || (tap_location == 5) || (tap_location == 25)) begin
+                xor tap(tap_out[i], q[N-1], q[tap_location]);
                 d_flip_flop_with_sr gen_with_tap(tap_out[i], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
+
+            // Create a flip-flop with no tap
             else begin
                 d_flip_flop_with_sr gen_no_tap(q[i-1], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
