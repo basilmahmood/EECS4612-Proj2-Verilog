@@ -61,7 +61,8 @@ module lfsr #(parameter N = 26)
         end
     endgenerate
 
-    genvar i, tap_location;
+    genvar i;
+    integer tap_location;
     generate
         for (i = 0; i < N; i++) begin
             begin
