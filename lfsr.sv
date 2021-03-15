@@ -52,9 +52,10 @@ module lfsr #(parameter N = 26)
                  output logic [N-1:0] qbar);
 
     logic [N-1:0] tap_out;
+    logic zero = 0;
 
     mux load_mux(mux_out, load, s, q[N-1]);
-    sr_flip_flop first_ff(mux_out, r, clk, q[0], qbar[0]);
+    d_flip_flop_with_sr first_ff(mux_out, zero, r, clk, q[0], qbar[0]);
 
     genvar i;
     generate
@@ -62,40 +63,35 @@ module lfsr #(parameter N = 26)
 
             if ((i == 2) || (i == 19)) begin
                 xor tap(tap_out[i], q[N-1], q[i-1]);
-                sr_flip_flop gen_with_tap(tap_out[i], r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_with_tap(tap_out[i], zero, r, clk, q[i], qbar[i]);
             end
             else begin
-                sr_flip_flop gen_no_tap(q[i-1], r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_no_tap(q[i-1], zero, r, clk, q[i], qbar[i]);
             end
 
         end
     endgenerate
 endmodule
 
-module sr_flip_flop(s, r, clk, q, qbar);
+// See https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop_with_set_and_reset.svg for diagram
+module d_flip_flop_with_sr(d, s, r, clk, q, qbar);
 
     input s,r,clk;
     output reg q, qbar;
 
     always @(posedge clk)
     begin
-
-    if(s == 1)
+    
+    if (s == 0 && r == 0)
         begin
-            q = 1;
-            qbar = 0;
+            q = d;
+            qbar = ~d;
         end
-    else if(r == 1)
+    else
         begin
-            q = 0;
-            qbar = 1;
+           q = s;
+           qbar = r;
         end
-    else if(s == 0 & r == 0)
-        begin
-            q = 0;
-            qbar <= 1;
-        end
-    end
 endmodule
 
 module mux(f, sel, a, b);
