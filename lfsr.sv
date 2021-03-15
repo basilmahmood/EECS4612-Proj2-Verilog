@@ -15,7 +15,7 @@ module testbench #(parameter N = 20);
     localparam cycle_period = (clk_period*N);
 
     initial begin
-        s = 4'b0;
+        s[3:0] = 4'b0;
         r = 1;
         clk = 0;
         load = 0;
@@ -29,12 +29,12 @@ module testbench #(parameter N = 20);
         #clk_period 
         r = 0;
         load = 1;
-        s = 4'b0001;
+        s[3:0] = 4'b0001;
 
         // Finish loading seed
         #clk_period
         load = 0;
-        s = 4'b0;
+        s[3:0] = 4'b0;
 
         #(cycle_period) $finish;
     end
