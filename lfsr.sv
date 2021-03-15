@@ -8,15 +8,13 @@ module testbench #(parameter N = 20);
     logic s, r, clk, load;
     logic [N-1:0] q, qbar;
 
-    //2. Instantiate the module we want to test. We have instantiated the srff_behavior
-
     lfsr #(N) dut(.*); // instantiate all ports
 
     localparam clk_period = 10;
     localparam cycle_period = (clk_period*N);
 
     initial begin
-        s = 0;
+        s = 4'b0;
         r = 1;
         clk = 0;
         load = 0;
@@ -30,12 +28,12 @@ module testbench #(parameter N = 20);
         #clk_period 
         r = 0;
         load = 1;
-        s = 1;
+        s = 4'b1000;
 
         // Finish loading seed
         #clk_period
         load = 0;
-        s = 0;
+        s = 4'b0;
 
         #(cycle_period) $finish;
     end
@@ -46,27 +44,33 @@ endmodule
 module lfsr #(parameter N = 26)
                 (input clk,
                  input r,
-                 input s,
+                 input [3:0] s,
                  input load,
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
 
     logic [N-1:0] tap_out;
+    logic [N-1:0] load_mux_out;
     logic zero = 0;
 
-    mux load_mux(mux_out, load, s, q[N-1]);
-    d_flip_flop_with_sr first_ff(mux_out, zero, r, clk, q[0], qbar[0]);
+    d_flip_flop_with_sr first_ff(tap_out[N-1], zero, r, clk, q[0], qbar[0]);
+    
+    genvar i_load_mux;
+    generate 
+        for (i_load_mux = 0; i_load_mux < 4; i_load_mux++)
+            mux load_mux(load_mux_out[i_load_mux], load, s[i_load_mux], zero);
+        end
+    endgenerate
 
     genvar i;
     generate
         for (i = 1; i < N; i++) begin
-
             if ((i == 2) || (i == 19)) begin
                 xor tap(tap_out[i], q[N-1], q[i-1]);
-                d_flip_flop_with_sr gen_with_tap(tap_out[i], zero, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_with_tap(tap_out[i], load_mux_out, r, clk, q[i], qbar[i]);
             end
             else begin
-                d_flip_flop_with_sr gen_no_tap(q[i-1], zero, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_no_tap(q[i-1], load_mux_out, r, clk, q[i], qbar[i]);
             end
 
         end
