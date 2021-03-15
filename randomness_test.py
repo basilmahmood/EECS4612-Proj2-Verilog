@@ -1,11 +1,11 @@
 ### Modified from https://www.geeksforgeeks.org/runs-test-of-randomness-in-python/ ###
-### Read the above webpage for more info on this type of randomness test ###
+### Read the above webpage for more info on this type of randomness test (runs test) ###
 
 from lfsr import lfsr
 import statistics
 import math
 
-def random_test(l, l_median):
+def runs_test(l, l_median):
 
     runs, n1, n2 = 0, 0, 0
 
@@ -42,8 +42,9 @@ for random_number_str in random_numbers_str:
     random_numbers.append(int(random_number_str, 2))
 
 median = (2**test_lfsr.size - 1)/2
-Z = random_test(random_numbers, median)
+Z = runs_test(random_numbers, median)
 
-Zcritical = 1.96
-print('Z-statistic =', abs(Z))
-print(f"The test { 'Passed' if (abs(Z) < Zcritical) else 'Failed'}") # Should be less than Zcritical for test to pass
+Z_critical = 1.96 # Confidence level of 95%
+print('Z-statistic =', abs(Z), ", Should be less than Zcritical =", Z_critical)
+print('Median =', statistics.median(random_numbers), ", Should be similar to expected median =", median)
+print(f"The test { 'Passed' if (abs(Z) < Z_critical) else 'Failed'}") # Should be less than Z_critical for test to pass
