@@ -36,7 +36,7 @@ module testbench #(parameter N = 26);
         load = 0;
         s[3:0] = 4'b0;
 
-        #(cycle_period) $finish;
+        #(cycle_period*2) $finish;
     end
 
 
