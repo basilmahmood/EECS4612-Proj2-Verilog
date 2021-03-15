@@ -29,7 +29,7 @@ module testbench #(parameter N = 20);
         #clk_period 
         r = 0;
         load = 1;
-        s = 4'b1;
+        s = 4'b0001;
 
         // Finish loading seed
         #clk_period
