@@ -76,22 +76,22 @@ endmodule
 // See https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop_with_set_and_reset.svg for diagram
 module d_flip_flop_with_sr(d, s, r, clk, q, qbar);
 
-    input s,r,clk;
+    input d,s,r,clk;
     output reg q, qbar;
 
     always @(posedge clk)
     begin
-    
-    if (s == 0 && r == 0)
-        begin
-            q = d;
-            qbar = ~d;
-        end
-    else
-        begin
-           q = s;
-           qbar = r;
-        end
+        if (s == 0 && r == 0)
+            begin
+                q = d;
+                qbar = ~d;
+            end
+        else
+            begin
+               q = s;
+               qbar = r;
+            end
+    end
 endmodule
 
 module mux(f, sel, a, b);
