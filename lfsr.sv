@@ -5,7 +5,8 @@
 //1. Declare module and ports
 
 module testbench #(parameter N = 20);
-    logic s, r, clk, load;
+    logic r, clk, load;
+    logic [3:0] s;
     logic [N-1:0] q, qbar;
 
     lfsr #(N) dut(.*); // instantiate all ports
