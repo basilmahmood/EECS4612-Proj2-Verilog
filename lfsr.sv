@@ -9,7 +9,7 @@ module testbench #(parameter N = 26);
     logic [3:0] s;
     logic [N-1:0] q, qbar;
 
-    lfsr #(N) dut(.*); // instantiate all ports
+    control #(N) control(.*); // instantiate all ports
 
     localparam clk_period = 10;
     localparam cycle_period = (clk_period*N);
@@ -41,6 +41,17 @@ module testbench #(parameter N = 26);
 
 
 endmodule
+
+module control #(parameter N = 26)
+                (input clk,
+                 input r,
+                 input [3:0] s,
+                 input load,
+                 output logic [N-1:0] q,
+                 output logic [N-1:0] qbar);
+    
+    lfsr #(N) lfsr(.*);
+endmodule   
 
 module lfsr #(parameter N = 26)
                 (input clk,
