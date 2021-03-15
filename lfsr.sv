@@ -71,7 +71,7 @@ module lfsr #(parameter N = 26)
         for (i = 1; i < N; i++) begin
             // Create a flip-flop with a tap (tap location is 1 behind index location, i.e for tap 0 its created on index 1)
             if ((i == 0 + 1) || (i == 1 + 1) || (i == 5 + 1)) begin
-                xor tap(tap_out[i], q[N-1], q[i]);
+                xor tap(tap_out[i], q[N-1], q[i-1]);
                 d_flip_flop_with_sr gen_with_tap(tap_out[i], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
 
