@@ -1,8 +1,9 @@
 # ignore everything
 *
 
-# Except Verilog, SystemVerilog and Test Vectors
+# Except Python, Verilog, SystemVerilog and Test Vectors
 !.gitignore
+!*.py
 !*.sv
 !*.v
 !*.tv
