@@ -61,16 +61,17 @@ module lfsr #(parameter N = 26)
         end
     endgenerate
 
-    genvar i;
-    integer tap_location;
-    
-    generate
-        for (i = 0; i < N; i++) begin
-            tap_location = (i - 1 > 0) ? (i - 1) : N-1; // Tap location is 1 behind the index location (on the first index, tap is created on the last index)
+    // First flip_flop + tap has special logic (since the tap is comming from the last index)
+    xor tap_first(tap_out[0], q[N-1], q[N-1]);
+    d_flip_flop_with_sr ff_first(tap_out[0], load_mux_out[0], r, clk, q[0], qbar[0]);
 
-            // Create a flip-flop with a tap
-            if ((tap_location == 0) || (tap_location == 1) || (tap_location == 5) || (tap_location == 25)) begin
-                xor tap(tap_out[i], q[N-1], q[tap_location]);
+    // Generate the rest of the taps and flip flops
+    genvar i;
+    generate
+        for (i = 1; i < N; i++) begin
+            // Create a flip-flop with a tap (tap location is 1 behind index location, i.e for tap 0 its created on index 1)
+            if ((i == 0 + 1) || (i == 1 + 1) || (i == 5 + 1)) begin
+                xor tap(tap_out[i], q[N-1], q[i]);
                 d_flip_flop_with_sr gen_with_tap(tap_out[i], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
 
