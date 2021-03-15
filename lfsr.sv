@@ -62,9 +62,10 @@ module lfsr #(parameter N = 26)
     endgenerate
 
     genvar i;
+    genvar tap_location;
     generate
         for (i = 0; i < N; i++) begin
-            genvar tap_location = (i - 1 > 0) ? (i - 1) : N-1; // Tap location is 1 behind the index location (on the first index, tap is created on the last index)
+            tap_location = (i - 1 > 0) ? (i - 1) : N-1; // Tap location is 1 behind the index location (on the first index, tap is created on the last index)
 
             // Create a flip-flop with a tap
             if ((tap_location == 0) || (tap_location == 1) || (tap_location == 5) || (tap_location == 25)) begin
