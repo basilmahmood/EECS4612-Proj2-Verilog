@@ -53,8 +53,6 @@ module lfsr #(parameter N = 26)
     logic [N-1:0] load_mux_out;
     logic zero = 0;
 
-    d_flip_flop_with_sr first_ff(tap_out[N-1], zero, r, clk, q[0], qbar[0]);
-    
     genvar i_load_mux;
     generate 
         for (i_load_mux = 0; i_load_mux < 4; i_load_mux++) begin
@@ -62,15 +60,16 @@ module lfsr #(parameter N = 26)
         end
     endgenerate
 
+    d_flip_flop_with_sr first_ff(tap_out[N-1], zero, r, clk, q[0], qbar[0]);
     genvar i;
     generate
         for (i = 1; i < N; i++) begin
             if ((i == 2) || (i == 19)) begin
                 xor tap(tap_out[i], q[N-1], q[i-1]);
-                d_flip_flop_with_sr gen_with_tap(tap_out[i], load_mux_out, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_with_tap(tap_out[i], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
             else begin
-                d_flip_flop_with_sr gen_no_tap(q[i-1], load_mux_out, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_no_tap(q[i-1], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
             end
 
         end
