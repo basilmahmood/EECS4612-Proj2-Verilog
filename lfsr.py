@@ -14,7 +14,7 @@ class lfsr:
             new_lfsr_list.append(0)
 
         for i, _ in enumerate(self.lfsr_list):
-            if ((i-1) in self.tap_locations):
+            if ((i-1) in self.tap_locations or ((i == 0) and (self.size-1 in self.tap_locations))): # if theres a tap
                 new_lfsr_list[i] = self.lfsr_list[i-1] ^ self.lfsr_list[-1]
             else:
                 new_lfsr_list[i] = self.lfsr_list[i-1]
@@ -34,7 +34,7 @@ class lfsr:
             for j in range(self.size):
                 self.shift()
 
-            random_number = ''.join([str(elem) for elem in self.lfsr_list]) 
+            random_number = ''.join([str(elem) for elem in reversed(self.lfsr_list)]) 
             random_numbers.append(random_number)
         
         return random_numbers
