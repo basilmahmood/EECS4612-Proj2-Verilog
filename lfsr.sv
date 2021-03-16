@@ -44,19 +44,19 @@ endmodule
 
 module control #(parameter N = 26)
                 (input clk,
-                 input r,
+                 input reset,
                  input [3:0] seed, 
                  input load,
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
 
     logic zero = 0;
-    logic [N-1:0] load_mux_out;
     logic [N-1:0] s;
+    logic r = reset;
 
     genvar i;
     generate 
-        for (i = 0; i < N-1; i++) begin
+        for (i = 0; i < N; i++) begin
             if (i < 4) begin
                 mux load_mux(s[i], load, seed[i], zero);
             end else begin
