@@ -1,13 +1,14 @@
 // Set delay unit to 1 ns and simulation precision to 0.1 ns (100 ps)
 `timescale 1ns / 100ps
 
-//test bench for d flip flop
-//1. Declare module and ports
+
 
 module testbench #(parameter N = 26);
     logic reset, clk, load, gen;
     logic [3:0] seed;
     logic [N-1:0] q, qbar;
+    logic [N-1:0] vectors[1000:0]
+    logic [10:0] vectornum, errors;
 
     control #(N) control(.*); // instantiate all ports
 
@@ -20,11 +21,14 @@ module testbench #(parameter N = 26);
         clk = 0;
         load = 0;
         gen = 0;
+        $readmemb("lfsr.tv", vectors);
+        vectornum = 0; 
+        errors = 0;
     end
 
     always
         #(clk_period/2) clk = ~clk;
-
+    
     initial begin
         // Loading seed
         #clk_period 
@@ -37,10 +41,24 @@ module testbench #(parameter N = 26);
         load = 0;
         seed[3:0] = 4'b0;
         gen = 1;
-
-        #(cycle_period*2) $finish;
     end
 
+    always begin
+        #(cycle_period)
+        currentvec = vectors[vectornum];
+        if (currentvec[0] === 1'bx) begin
+            $display("Completed %d tests with %d errors.", 
+                    vectornum, errors);
+            $stop;
+        end else begin
+            if (q[N-1:0] !== vectors[N-1:0]) begin
+                $display("output = %b (%b expected)", q[N-1:0], vectors[N-1:0]);
+                errors = errors + 1;
+            end
+            vectornum = vectornum + 1;
+        end
+        
+    end
 
 endmodule
 
@@ -69,7 +87,7 @@ module control #(parameter N = 26)
 
     or clk_or(clk_on, reset, load, gen);
     mux clk_mux(clk_mux_out, clk_on, clk, zero);
-    
+
     lfsr #(N) lfsr(.*, .clk (clk_mux_out), .r (reset));
 endmodule   
 
