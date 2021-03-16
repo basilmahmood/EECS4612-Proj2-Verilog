@@ -7,7 +7,7 @@ module testbench #(parameter N = 26);
     logic reset, clk, load, gen;
     logic [3:0] seed;
     logic [N-1:0] q, qbar;
-    logic [N-1:0] vectors[1000:0]
+    logic [N-1:0] vectors[1000:0];
     logic [10:0] vectornum, errors;
 
     control #(N) control(.*); // instantiate all ports
@@ -47,8 +47,7 @@ module testbench #(parameter N = 26);
         #(cycle_period)
         currentvec = vectors[vectornum];
         if (currentvec[0] === 1'bx) begin
-            $display("Completed %d tests with %d errors.", 
-                    vectornum, errors);
+            $display("Completed %d tests with %d errors.", vectornum, errors);
             $stop;
         end else begin
             if (q[N-1:0] !== vectors[N-1:0]) begin
