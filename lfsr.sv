@@ -52,7 +52,7 @@ module control #(parameter N = 26)
 
     logic zero = 0;
     logic [N-1:0] load_mux_out;
-    logic s;
+    logic [N-1:0] s;
     logic r;
 
     genvar i_load_mux;
