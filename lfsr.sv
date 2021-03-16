@@ -1,14 +1,13 @@
 // Set delay unit to 1 ns and simulation precision to 0.1 ns (100 ps)
 `timescale 1ns / 100ps
 
-
-
 module testbench #(parameter N = 26);
     logic reset, clk, load, gen;
     logic [3:0] seed;
     logic [N-1:0] q, qbar;
     logic [N-1:0] vectors[1000:0], currentvec;
     logic [10:0] vectornum, errors;
+    logic always_flag;
 
     control #(N) control(.*); // instantiate all ports
 
@@ -44,7 +43,9 @@ module testbench #(parameter N = 26);
     end
 
     always begin
-        #(cycle_period)
+        #(cycle_period) // Delay by the cycle period every time
+        if (vectornum == 0) #(clk_period*2); // Delay by an additional 2 clk_periods if first run
+
         currentvec = vectors[vectornum];
         if (currentvec[0] === 1'bx) begin
             $display("Completed %d tests with %d errors.", vectornum, errors);
