@@ -22,16 +22,16 @@ module testbench #(parameter N = 26);
         load = 0;
         gen = 0;
         $readmemb("lfsr.tv", vectors);
-        vectornum = 0; 
+        vectornum = 0;
         errors = 0;
     end
 
     always
         #(clk_period/2) clk = ~clk;
-    
+
     initial begin
         // Loading seed
-        #clk_period 
+        #clk_period
         reset = 0;
         load = 1;
         seed[3:0] = 4'b0001;
@@ -50,13 +50,13 @@ module testbench #(parameter N = 26);
             $display("Completed %d tests with %d errors.", vectornum, errors);
             $stop;
         end else begin
-            if (q[N-1:0] !== vectors[N-1:0]) begin
-                $display("output = %b (%b expected)", q[N-1:0], vectors[N-1:0]);
+            if (q[N-1:0] !== currentvec[N-1:0]) begin
+                $display("output = %b (%b expected)", q[N-1:0], currentvec[N-1:0]);
                 errors = errors + 1;
             end
             vectornum = vectornum + 1;
         end
-        
+
     end
 
 endmodule
@@ -64,7 +64,7 @@ endmodule
 module control #(parameter N = 26)
                 (input clk,
                  input reset,
-                 input [3:0] seed, 
+                 input [3:0] seed,
                  input load,
                  input gen,
                  output logic [N-1:0] q,
@@ -74,7 +74,7 @@ module control #(parameter N = 26)
     logic [N-1:0] s;
 
     genvar i;
-    generate 
+    generate
         for (i = 0; i < N; i++) begin
             if (i < 4) begin
                 mux load_mux(s[i], load, seed[i], zero);
@@ -88,7 +88,7 @@ module control #(parameter N = 26)
     mux clk_mux(clk_mux_out, clk_on, clk, zero);
 
     lfsr #(N) lfsr(.*, .clk (clk_mux_out), .r (reset));
-endmodule   
+endmodule
 
 module lfsr #(parameter N = 26)
                 (input clk,
@@ -98,7 +98,7 @@ module lfsr #(parameter N = 26)
                  output logic [N-1:0] qbar);
 
     logic [N-1:0] tap_out;
-    
+
     // First flip_flop + tap has special logic (since the tap is comming from the last index)
     xor tap_first(tap_out[0], q[N-1], q[N-1]);
     d_flip_flop_with_sr ff_first(tap_out[0], s[0], r, clk, q[0], qbar[0]);
