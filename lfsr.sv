@@ -67,8 +67,9 @@ module control #(parameter N = 26)
         end
     endgenerate
 
-    mux clk_mux(clk_mux_out, gen, clk, zero);
-
+    or clk_or(clk_on, reset, load, gen);
+    mux clk_mux(clk_mux_out, clk_on, clk, zero);
+    
     lfsr #(N) lfsr(.*, .clk (clk_mux_out), .r (reset));
 endmodule   
 
