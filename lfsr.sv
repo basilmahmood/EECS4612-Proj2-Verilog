@@ -7,7 +7,7 @@ module testbench #(parameter N = 26);
     logic reset, clk, load, gen;
     logic [3:0] seed;
     logic [N-1:0] q, qbar;
-    logic [N-1:0] vectors[1000:0];
+    logic [N-1:0] vectors[1000:0], currentvec;
     logic [10:0] vectornum, errors;
 
     control #(N) control(.*); // instantiate all ports
