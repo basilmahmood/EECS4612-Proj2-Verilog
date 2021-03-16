@@ -52,7 +52,6 @@ module control #(parameter N = 26)
 
     logic zero = 0;
     logic [N-1:0] s;
-    logic r = reset;
 
     genvar i;
     generate 
@@ -65,7 +64,7 @@ module control #(parameter N = 26)
         end
     endgenerate
 
-    lfsr #(N) lfsr(.*);
+    lfsr #(N) lfsr(.*, .r (reset));
 endmodule   
 
 module lfsr #(parameter N = 26)
