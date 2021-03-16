@@ -44,7 +44,7 @@ endmodule
 
 module control #(parameter N = 26)
                 (input clk,
-                 input reset,
+                 input r,
                  input [3:0] seed, 
                  input load,
                  output logic [N-1:0] q,
@@ -53,24 +53,24 @@ module control #(parameter N = 26)
     logic zero = 0;
     logic [N-1:0] load_mux_out;
     logic [N-1:0] s;
-    logic r;
 
-    genvar i_load_mux;
+    genvar i;
     generate 
-        for (i_load_mux = 0; i_load_mux < 4; i_load_mux++) begin
-            mux load_mux(s[i_load_mux], load, seed[i_load_mux], zero);
+        for (i = 0; i < N-1; i++) begin
+            if (i < 4) begin
+                mux load_mux(s[i], load, seed[i], zero);
+            end else begin
+                assign s[i] = zero;
+            end
         end
     endgenerate
-    
-    assign s[N-1:4] = {(N-4){zero}};
-    assign r[N-1:0] = {N{reset}};
 
     lfsr #(N) lfsr(.*);
 endmodule   
 
 module lfsr #(parameter N = 26)
                 (input clk,
-                 input [N-1:0] r, // Reset for flip flops
+                 input r, // Reset for flip flops
                  input [N-1:0] s, // Set for flip flops
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
@@ -79,7 +79,7 @@ module lfsr #(parameter N = 26)
     
     // First flip_flop + tap has special logic (since the tap is comming from the last index)
     xor tap_first(tap_out[0], q[N-1], q[N-1]);
-    d_flip_flop_with_sr ff_first(tap_out[0], s[0], r[0], clk, q[0], qbar[0]);
+    d_flip_flop_with_sr ff_first(tap_out[0], s[0], r, clk, q[0], qbar[0]);
 
     // Generate the rest of the taps and flip flops
     genvar i;
@@ -88,12 +88,12 @@ module lfsr #(parameter N = 26)
             // Create a flip-flop with a tap (tap location is 1 behind index location, i.e for tap 0 its created on index 1)
             if ((i == 0 + 1) || (i == 1 + 1) || (i == 5 + 1)) begin
                 xor tap(tap_out[i], q[N-1], q[i-1]);
-                d_flip_flop_with_sr gen_with_tap(tap_out[i], s[i], r[i], clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_with_tap(tap_out[i], s[i], r, clk, q[i], qbar[i]);
             end
 
             // Create a flip-flop with no tap
             else begin
-                d_flip_flop_with_sr gen_no_tap(q[i-1], s[i], r[i], clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_no_tap(q[i-1], s[i], r, clk, q[i], qbar[i]);
             end
 
         end
