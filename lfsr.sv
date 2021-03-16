@@ -5,7 +5,7 @@
 //1. Declare module and ports
 
 module testbench #(parameter N = 26);
-    logic reset, clk, load;
+    logic reset, clk, load, gen;
     logic [3:0] seed;
     logic [N-1:0] q, qbar;
 
@@ -19,6 +19,7 @@ module testbench #(parameter N = 26);
         reset = 1;
         clk = 0;
         load = 0;
+        gen = 0;
     end
 
     always
@@ -31,10 +32,11 @@ module testbench #(parameter N = 26);
         load = 1;
         seed[3:0] = 4'b0001;
 
-        // Finish loading seed
+        // Finish loading seed and start generation
         #clk_period
         load = 0;
         seed[3:0] = 4'b0;
+        gen = 1;
 
         #(cycle_period*2) $finish;
     end
@@ -47,6 +49,7 @@ module control #(parameter N = 26)
                  input reset,
                  input [3:0] seed, 
                  input load,
+                 input gen,
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
 
@@ -64,7 +67,9 @@ module control #(parameter N = 26)
         end
     endgenerate
 
-    lfsr #(N) lfsr(.*, .r (reset));
+    mux clk_mux(clk_mux_out, gen, clk, zero);
+
+    lfsr #(N) lfsr(.*, .clk (clk_mux_out), .r (reset));
 endmodule   
 
 module lfsr #(parameter N = 26)
