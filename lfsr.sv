@@ -62,9 +62,9 @@ module control #(parameter N = 26)
         end
     endgenerate
     
-    assign s[N-1:4] = {(N-4){zero}}
-    assign r[N-1:0] = {N{reset}}
-    
+    assign s[N-1:4] = {(N-4){zero}};
+    assign r[N-1:0] = {N{reset}};
+
     lfsr #(N) lfsr(.*);
 endmodule   
 
