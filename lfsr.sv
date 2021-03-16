@@ -5,8 +5,8 @@
 //1. Declare module and ports
 
 module testbench #(parameter N = 26);
-    logic r, clk, load;
-    logic [3:0] s;
+    logic reset, clk, load;
+    logic [3:0] seed;
     logic [N-1:0] q, qbar;
 
     control #(N) control(.*); // instantiate all ports
@@ -15,8 +15,8 @@ module testbench #(parameter N = 26);
     localparam cycle_period = (clk_period*N);
 
     initial begin
-        s[3:0] = 4'b0;
-        r = 1;
+        seed[3:0] = 4'b0;
+        reset = 1;
         clk = 0;
         load = 0;
     end
@@ -27,14 +27,14 @@ module testbench #(parameter N = 26);
     initial begin
         // Loading seed
         #clk_period 
-        r = 0;
+        reset = 0;
         load = 1;
-        s[3:0] = 4'b0001;
+        seed[3:0] = 4'b0001;
 
         // Finish loading seed
         #clk_period
         load = 0;
-        s[3:0] = 4'b0;
+        seed[3:0] = 4'b0;
 
         #(cycle_period*2) $finish;
     end
@@ -44,37 +44,42 @@ endmodule
 
 module control #(parameter N = 26)
                 (input clk,
-                 input r,
-                 input [3:0] s,
+                 input reset,
+                 input [3:0] seed, 
                  input load,
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
+
+    logic zero = 0;
+    logic [N-1:0] load_mux_out;
+    logic s;
+    logic r;
+
+    genvar i_load_mux;
+    generate 
+        for (i_load_mux = 0; i_load_mux < 4; i_load_mux++) begin
+            mux load_mux(s[i_load_mux], load, seed[i_load_mux], zero);
+        end
+    endgenerate
+    
+    assign s[N-1:4] = {(N-4){zero}}
+    assign r[N-1:0] = {N{reset}}
     
     lfsr #(N) lfsr(.*);
 endmodule   
 
 module lfsr #(parameter N = 26)
                 (input clk,
-                 input r,
-                 input [3:0] s,
-                 input load,
+                 input [N-1:0] r, // Reset for flip flops
+                 input [N-1:0] s, // Set for flip flops
                  output logic [N-1:0] q,
                  output logic [N-1:0] qbar);
 
     logic [N-1:0] tap_out;
-    logic [N-1:0] load_mux_out;
-    logic zero = 0;
-
-    genvar i_load_mux;
-    generate 
-        for (i_load_mux = 0; i_load_mux < 4; i_load_mux++) begin
-            mux load_mux(load_mux_out[i_load_mux], load, s[i_load_mux], zero);
-        end
-    endgenerate
-
+    
     // First flip_flop + tap has special logic (since the tap is comming from the last index)
     xor tap_first(tap_out[0], q[N-1], q[N-1]);
-    d_flip_flop_with_sr ff_first(tap_out[0], load_mux_out[0], r, clk, q[0], qbar[0]);
+    d_flip_flop_with_sr ff_first(tap_out[0], s[0], r[0], clk, q[0], qbar[0]);
 
     // Generate the rest of the taps and flip flops
     genvar i;
@@ -83,12 +88,12 @@ module lfsr #(parameter N = 26)
             // Create a flip-flop with a tap (tap location is 1 behind index location, i.e for tap 0 its created on index 1)
             if ((i == 0 + 1) || (i == 1 + 1) || (i == 5 + 1)) begin
                 xor tap(tap_out[i], q[N-1], q[i-1]);
-                d_flip_flop_with_sr gen_with_tap(tap_out[i], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_with_tap(tap_out[i], s[i], r[i], clk, q[i], qbar[i]);
             end
 
             // Create a flip-flop with no tap
             else begin
-                d_flip_flop_with_sr gen_no_tap(q[i-1], (i < 4) ? load_mux_out[i] : zero, r, clk, q[i], qbar[i]);
+                d_flip_flop_with_sr gen_no_tap(q[i-1], s[i], r[i], clk, q[i], qbar[i]);
             end
 
         end
