@@ -79,7 +79,7 @@ module control #(parameter N = 26)
     mux load_mux_2(s[2], load, seed[2], zero);
     mux load_mux_3(s[3], load, seed[3], zero);
 
-    assign s[25:3] = 22'b0;
+    assign s[25:4] = 21'b0;
 
     or clk_or(clk_on, reset, load, gen);
     mux clk_mux(clk_mux_out, clk_on, clk, zero);
