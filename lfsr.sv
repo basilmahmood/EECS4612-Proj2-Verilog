@@ -103,17 +103,17 @@ module lfsr #(parameter N = 26)
     xor tap_0(tap_out[0], q[N-1], q[N-1]);
     d_flip_flop_with_sr ff_0(tap_out[0], s[0], r, clk, q[0], qbar[0]);
 
-    xor tap_1(tap_out[1], q[0], q[0]);
+    xor tap_1(tap_out[1], q[0], q[N-1]);
     d_flip_flop_with_sr ff_1(tap_out[1], s[1], r, clk, q[1], qbar[1]);
 
-    xor tap_2(tap_out[2], q[1], q[1]);
+    xor tap_2(tap_out[2], q[1], q[N-1]);
     d_flip_flop_with_sr ff_2(tap_out[2], s[2], r, clk, q[2], qbar[2]);
 
     d_flip_flop_with_sr ff_3(q[2], s[3], r, clk, q[3], qbar[3]);
     d_flip_flop_with_sr ff_4(q[3], s[4], r, clk, q[4], qbar[4]);
     d_flip_flop_with_sr ff_5(q[4], s[5], r, clk, q[5], qbar[5]);
 
-    xor tap_6(tap_out[6], q[5], q[5]);
+    xor tap_6(tap_out[6], q[5], q[N-1]);
     d_flip_flop_with_sr ff_6(tap_out[6], s[6], r, clk, q[6], qbar[6]);
 
     d_flip_flop_with_sr ff_7(q[6], s[7], r, clk, q[7], qbar[7]);
