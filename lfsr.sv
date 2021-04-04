@@ -100,27 +100,42 @@ module lfsr #(parameter N = 26)
 
     logic [N-1:0] tap_out;
 
-    // First flip_flop + tap has special logic (since the tap is comming from the last index)
-    xor tap_first(tap_out[0], q[N-1], q[N-1]);
-    d_flip_flop_with_sr ff_first(tap_out[0], s[0], r, clk, q[0], qbar[0]);
+    xor tap_0(tap_out[0], q[N-1], q[N-1]);
+    d_flip_flop_with_sr ff_0(tap_out[0], s[0], r, clk, q[0], qbar[0]);
 
-    // Generate the rest of the taps and flip flops
-    genvar i;
-    generate
-        for (i = 1; i < N; i++) begin
-            // Create a flip-flop with a tap (tap location is 1 behind index location, i.e for tap 0 its created on index 1)
-            if ((i == 0 + 1) || (i == 1 + 1) || (i == 5 + 1)) begin
-                xor tap(tap_out[i], q[N-1], q[i-1]);
-                d_flip_flop_with_sr gen_with_tap(tap_out[i], s[i], r, clk, q[i], qbar[i]);
-            end
+    xor tap_1(tap_out[1], q[0], q[0]);
+    d_flip_flop_with_sr ff_1(tap_out[1], s[1], r, clk, q[1], qbar[1]);
 
-            // Create a flip-flop with no tap
-            else begin
-                d_flip_flop_with_sr gen_no_tap(q[i-1], s[i], r, clk, q[i], qbar[i]);
-            end
+    xor tap_2(tap_out[2], q[1], q[1]);
+    d_flip_flop_with_sr ff_2(tap_out[2], s[2], r, clk, q[2], qbar[2]);
 
-        end
-    endgenerate
+    d_flip_flop_with_sr ff_3(q[2], s[3], r, clk, q[3], qbar[3]);
+    d_flip_flop_with_sr ff_4(q[3], s[4], r, clk, q[4], qbar[4]);
+    d_flip_flop_with_sr ff_5(q[4], s[5], r, clk, q[5], qbar[5]);
+
+    xor tap_6(tap_out[6], q[5], q[5]);
+    d_flip_flop_with_sr ff_6(tap_out[6], s[6], r, clk, q[6], qbar[6]);
+
+    d_flip_flop_with_sr ff_7(q[6], s[7], r, clk, q[7], qbar[7]);
+    d_flip_flop_with_sr ff_8(q[7], s[8], r, clk, q[8], qbar[8]);
+    d_flip_flop_with_sr ff_9(q[8], s[9], r, clk, q[9], qbar[9]);
+    d_flip_flop_with_sr ff_10(q[9], s[10], r, clk, q[10], qbar[10]);
+    d_flip_flop_with_sr ff_11(q[10], s[11], r, clk, q[11], qbar[11]);
+    d_flip_flop_with_sr ff_12(q[11], s[12], r, clk, q[12], qbar[12]);
+    d_flip_flop_with_sr ff_13(q[12], s[13], r, clk, q[13], qbar[13]);
+    d_flip_flop_with_sr ff_14(q[13], s[14], r, clk, q[14], qbar[14]);
+    d_flip_flop_with_sr ff_15(q[14], s[15], r, clk, q[15], qbar[15]);
+    d_flip_flop_with_sr ff_16(q[15], s[16], r, clk, q[16], qbar[16]);
+    d_flip_flop_with_sr ff_17(q[16], s[17], r, clk, q[17], qbar[17]);
+    d_flip_flop_with_sr ff_18(q[17], s[18], r, clk, q[18], qbar[18]);
+    d_flip_flop_with_sr ff_19(q[18], s[19], r, clk, q[19], qbar[19]);
+    d_flip_flop_with_sr ff_20(q[19], s[20], r, clk, q[20], qbar[20]);
+    d_flip_flop_with_sr ff_21(q[20], s[21], r, clk, q[21], qbar[21]);
+    d_flip_flop_with_sr ff_22(q[21], s[22], r, clk, q[22], qbar[22]);
+    d_flip_flop_with_sr ff_23(q[22], s[23], r, clk, q[23], qbar[23]);
+    d_flip_flop_with_sr ff_24(q[23], s[24], r, clk, q[24], qbar[24]);
+    d_flip_flop_with_sr ff_25(q[24], s[25], r, clk, q[25], qbar[25]);
+    
 endmodule
 
 // See https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop_with_set_and_reset.svg for diagram
